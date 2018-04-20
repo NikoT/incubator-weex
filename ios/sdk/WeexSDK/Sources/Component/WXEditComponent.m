@@ -856,9 +856,9 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
 #pragma mark keyboard
 - (void)keyboardWasShown:(NSNotification*)notification
 {
-    if(![self.view isFirstResponder]) {
-        return;
-    }
+//    if(![self.view isFirstResponder]) {
+//        return;
+//    }
     if (!_disableMoveViewUp) {
         CGRect end = [[[notification userInfo] objectForKey:@"UIKeyboardFrameEndUserInfoKey"] CGRectValue];
         _keyboardSize = end.size;
@@ -883,9 +883,9 @@ WX_EXPORT_METHOD(@selector(setTextFormatter:))
 
 - (void)keyboardWillHide:(NSNotification*)notification
 {
-    if (![self.view isFirstResponder]) {
-        return;
-    }
+//    if (![self.view isFirstResponder]) {
+//        return;
+//    }
     if (!_disableMoveViewUp) {
         UIView * rootView = self.weexInstance.rootView;
         if (!CGRectEqualToRect(self.weexInstance.frame, rootView.frame)) {

@@ -33,6 +33,9 @@
 @property (nonatomic, strong) UIView *weexView;
 @property (nonatomic, strong) NSURL *sourceURL;
 
+@property (nonatomic, assign) int appeared;
+
+
 @end
 
 @implementation WXBaseViewController
@@ -60,16 +63,25 @@
  *  page content.
  */
 
+- (UIEdgeInsets)_safeAreaInset:(UIView *)view {
+    if (@available(iOS 11.0, *)) {
+        return view.safeAreaInsets;
+    }
+    return UIEdgeInsetsZero;
+}
+
 - (void)viewWillLayoutSubviews
 {
     [super viewWillLayoutSubviews];
+
     
-    if ([self.navigationController isKindOfClass:[WXRootViewController class]]) {
-        CGRect frame = self.view.frame;
-        frame.origin.y = 0;
-        frame.size.height = [UIScreen mainScreen].bounds.size.height;
-        self.view.frame = frame;
-    }    
+//    if ([self.navigationController isKindOfClass:[WXRootViewController class]]) {
+//        CGRect frame = self.view.frame;
+//        frame.origin.y = 0;
+//        frame.size.height = [UIScreen mainScreen].bounds.size.height;
+//        self.view.frame = frame;
+//    }
+    
 }
 
 /**
@@ -85,6 +97,21 @@
     if ([self.navigationController isKindOfClass:[WXRootViewController class]]) {
         [self.navigationController setNavigationBarHidden:YES animated:YES];
     }
+    
+
+
+}
+
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+//    BOOL hiddenAnime = NO;
+//    if ([WXSDKEngine topInstance] == self.instance && _appeared>0) {
+//        hiddenAnime = YES;
+//    }
+//    [self.navigationController setNavigationBarHidden:YES animated:hiddenAnime];
+//    _appeared++;
+    
+    [self.navigationController setNavigationBarHidden:YES animated:NO];
 
 }
 
@@ -95,9 +122,14 @@
     
 }
 
+- (void)viewWillDisappear:(BOOL)animated{
+    [super viewWillDisappear:animated];
+}
+
 - (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
+
     [self _updateInstanceState:WeexInstanceDisappear];
 }
 
@@ -136,12 +168,19 @@
     _instance.pageName = sourceURL.absoluteString;
     _instance.viewController = self;
     
+    UIEdgeInsets inset = [self _safeAreaInset:[UIApplication sharedApplication].keyWindow];
+    CGRect rect = CGRectMake(inset.left, inset.top, self.view.frame.size.width-inset.left-inset.right, self.view.frame.size.height-inset.top-inset.bottom);
+    self.view.frame = rect;
+    _instance.frame = rect;
+
+    
     NSString *newURL = nil;
     
     if ([sourceURL.absoluteString rangeOfString:@"?"].location != NSNotFound) {
         newURL = [NSString stringWithFormat:@"%@&random=%d", sourceURL.absoluteString, arc4random()];
     } else {
-        newURL = [NSString stringWithFormat:@"%@?random=%d", sourceURL.absoluteString, arc4random()];
+//        newURL = [NSString stringWithFormat:@"%@?random=%d", sourceURL.absoluteString, arc4random()];    //lot remove  ,我们做了自己的缓存 url不能变化.
+        newURL = sourceURL.absoluteString;
     }
     [_instance renderWithURL:[NSURL URLWithString:newURL] options:@{@"bundleUrl":sourceURL.absoluteString} data:nil];
     

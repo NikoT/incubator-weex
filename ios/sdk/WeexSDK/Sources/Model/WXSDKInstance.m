@@ -47,6 +47,8 @@
 #import "WXTracingManager.h"
 #import "WXExceptionUtils.h"
 #import "WXMonitor.h"
+#import "LZWeexCache.h"
+
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -160,6 +162,8 @@ typedef enum : NSUInteger {
         WXLogError(@"Url must be passed if you use renderWithURL");
         return;
     }
+
+    url = [[LZWeexCache instance] weexUrl:url];
     
     self.needValidate = [[WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)] needValidate:url];
     
